@@ -178,6 +178,7 @@
   tags: [bootstrap-os, etchosts]
 
 - include: resolvconf.yml
+  when: dns_mode in ['dnsmasq_kubedns', 'kubedns']
   tags: [bootstrap-os, resolvconf]
   
 - name: Check if we are running inside a Azure VM

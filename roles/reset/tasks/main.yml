@@ -42,6 +42,8 @@
     - /etc/cni
     - /etc/nginx
     - /etc/dnsmasq.d
+    - /etc/dnsmasq.conf
+    - /etc/dnsmasq.d-available
     - /etc/etcd.env
     - /etc/calico
     - /opt/cni
