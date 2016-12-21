@@ -17,7 +17,7 @@ KUBELET_HOSTNAME="--hostname-override={{ ansible_hostname }}"
 {% set kubelet_args_base %}--pod-manifest-path={{ kube_manifest_dir }} --pod-infra-container-image={{ pod_infra_image_repo }}:{{ pod_infra_image_tag }}{% endset %}
 
 {# DNS settings for kubelet #}
-{% if dns_mode == 'kubedns' %}
+{% if dns_mode in ['kubedns', 'docker_kubedns'] %}
 {% set kubelet_args_cluster_dns %}--cluster_dns={{ skydns_server }}{% endset %}
 {% elif dns_mode == 'dnsmasq_kubedns' %}
 {% set kubelet_args_cluster_dns %}--cluster_dns={{ dns_server }}{% endset %}

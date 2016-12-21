@@ -1,0 +1,41 @@
+---
+
+- name: set base docker dns facts
+  set_fact:
+    docker_dns_servers:
+      - "{{ skydns_server }}"
+    docker_dns_search_domains:
+      - 'default.svc.{{ dns_domain }}'
+      - 'svc.{{ dns_domain }}'
+    docker_dns_options:
+      - ndots:{{ ndots }}
+      - timeout:2
+      - attempts:2
+
+- name: add upstream dns servers
+  set_fact:
+    docker_dns_servers: "{{ docker_dns_servers + upstream_dns_servers|default([]) }}"
+
+- name: add global searchdomains
+  set_fact:
+    docker_dns_search_domains: "{{ docker_dns_search_domains + searchdomains|default([]) }}"
+
+- name: check system nameservers
+  shell: grep "^nameserver" /etc/resolv.conf | sed 's/nameserver\s*//'
+  changed_when: False
+  register: system_nameservers
+
+- name: check system search domains
+  shell: grep "^search" /etc/resolv.conf | sed 's/search\s*//'
+  changed_when: False
+  register: system_search_domains
+
+- name: add system nameservers to docker options
+  set_fact:
+    docker_dns_servers: "{{ docker_dns_servers + [item] }}"
+  with_items: "{{ system_nameservers.stdout_lines|default([]) }}"
+
+- name: add system search domains to docker options
+  set_fact:
+    docker_dns_search_domains: "{{ docker_dns_search_domains + [item] }}"
+  with_items: "{{ system_search_domains.stdout_lines|default([]) }}"
