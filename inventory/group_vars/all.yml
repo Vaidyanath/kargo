@@ -137,8 +137,11 @@ kube_apiserver_insecure_port: 8080 # (http)
 # as it greatly simplifies configuration of your applications - you can use
 # service names instead of magic environment variables.
 
-# Can be docker_kubedns, dnsmasq_kubedns, kubedns or none
+# Can be dnsmasq_kubedns, kubedns or none
 dns_mode: dnsmasq_kubedns
+
+# Can be docker_dns, host_resolvconf or none
+resolvconf_mode: docker_dns
 
 ## Upstream dns servers used by dnsmasq
 #upstream_dns_servers:

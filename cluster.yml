@@ -57,7 +57,7 @@
   any_errors_fatal: true
   roles:
     - { role: dnsmasq, when: "dns_mode == 'dnsmasq_kubedns'", tags: dnsmasq }
-    - { role: kubernetes/preinstall, when: "dns_mode in ['dnsmasq_kubedns', 'kubedns']", tags: resolvconf }
+    - { role: kubernetes/preinstall, when: "dns_mode != 'none' and resolvconf_mode == 'host_resolvconf'", tags: resolvconf }
 
 - hosts: kube-master[0]
   any_errors_fatal: true
