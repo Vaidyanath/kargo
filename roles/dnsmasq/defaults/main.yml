@@ -26,3 +26,18 @@ dns_cpu_limit: 100m
 dns_memory_limit: 170Mi
 dns_cpu_requests: 70m
 dns_memory_requests: 70Mi
+
+# Linux capabilities to be dropped for k8s apps ran by docker container engine
+apps_drop_cap:
+  - chown
+  - dac_override
+  - fowner
+  - fsetid
+  - kill
+  - setgid
+  - setuid
+  - setpcap
+  - sys_chroot
+  - mknod
+  - audit_write
+  - setfcap

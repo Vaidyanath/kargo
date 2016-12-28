@@ -19,6 +19,10 @@
 - name: Weave | set perms
   file: path="{{ bin_dir }}/weave" mode=0755 state=file
 
+- name: Weave | get network plugin user ID
+  shell: /usr/bin/id -u {{ netplug_user }} || echo 0
+  register: uid
+
 - name: Weave | Set options
   template:
     src: weave.j2

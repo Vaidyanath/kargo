@@ -6,7 +6,8 @@ Requires=docker.service
 [Service]
 EnvironmentFile=/etc/calico/calico-rr.env
 ExecStartPre=-{{ docker_bin_dir }}/docker rm -f calico-rr
-ExecStart={{ docker_bin_dir }}/docker run --net=host --privileged \
+ExecStartPre=-/usr/bin/chown -R {{ netplug_user }}:{{ netplug_group }} /var/log/calico-rr
+ExecStart=/bin/sh -c "{{ docker_bin_dir }}/docker run --net=host --privileged \
  --name=calico-rr \
  -e IP=${IP} \
  -e IP6=${IP6} \
@@ -16,8 +17,12 @@ ExecStart={{ docker_bin_dir }}/docker run --net=host --privileged \
  -e ETCD_KEY_FILE=${ETCD_KEY_FILE} \
  -v /var/log/calico-rr:/var/log/calico \
  -v {{ calico_cert_dir }}:{{ calico_cert_dir }}:ro \
+{% for c in calico_drop_cap %}
+ --cap-drop={{ c }} \
+{% endfor %}
  --memory={{ calico_rr_memory_limit|regex_replace('Mi', 'M') }} --cpu-shares={{ calico_rr_cpu_limit|regex_replace('m', '') }} \
- {{ calico_rr_image_repo }}:{{ calico_rr_image_tag }}
+ -u $(/usr/bin/id -u {{ netplug_user }}|| echo 0) \
+ {{ calico_rr_image_repo }}:{{ calico_rr_image_tag }}"
 
 Restart=always
 RestartSec=10s

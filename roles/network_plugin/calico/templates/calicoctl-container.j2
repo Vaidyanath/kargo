@@ -9,6 +9,9 @@
 -v /var/run/docker.sock:/var/run/docker.sock \
 -v /var/run/calico:/var/run/calico \
 -v /etc/calico/certs:/etc/calico/certs:ro \
+{% for c in calico_drop_cap %}
+--cap-drop={{ c }} \
+{% endfor %}
 --memory={{ calicoctl_memory_limit|regex_replace('Mi', 'M') }} --cpu-shares={{ calicoctl_cpu_limit|regex_replace('m', '') }} \
 {{ calicoctl_image_repo }}:{{ calicoctl_image_tag}} \
 $@

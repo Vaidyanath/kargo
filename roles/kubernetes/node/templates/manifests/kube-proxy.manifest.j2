@@ -34,6 +34,11 @@ spec:
 {% endif %}
     securityContext:
       privileged: true
+      capabilities:
+        drop:
+{% for c in apps_drop_cap %}
+          - {{ c.upper() }}
+{% endfor %}
     volumeMounts:
     - mountPath: /etc/ssl/certs
       name: ssl-certs-host

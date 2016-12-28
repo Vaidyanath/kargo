@@ -11,6 +11,12 @@ spec:
   - name: kube-scheduler
     image: {{ hyperkube_image_repo }}:{{ hyperkube_image_tag }}
     imagePullPolicy: {{ k8s_image_pull_policy }}
+    securityContext:
+      capabilities:
+        drop:
+{% for c in apps_drop_cap %}
+          - {{ c.upper() }}
+{% endfor %}
     resources:
       limits:
         cpu: {{ kube_scheduler_cpu_limit }}

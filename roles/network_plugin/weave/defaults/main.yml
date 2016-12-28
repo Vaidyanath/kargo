@@ -1,4 +1,21 @@
 ---
+# Linux capabilities to be dropped for docker container engine
+weave_drop_cap:
+  - chown
+  - dac_override
+  - fowner
+  - fsetid
+  - kill
+  - setgid
+  - setuid
+  - setpcap
+  - net_bind_service
+  - net_raw
+  - sys_chroot
+  - mknod
+  - audit_write
+  - setfcap
+
 # Limits
 weave_memory_limit: 500M
 weave_cpu_limit: 300m

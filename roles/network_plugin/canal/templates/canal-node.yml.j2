@@ -112,6 +112,11 @@ spec:
               containerPort: 10253
           securityContext:
             privileged: true
+            capabilities:
+              drop:
+{% for c in apps_drop_cap %}
+                - {{ c.upper() }}
+{% endfor %}
           volumeMounts:
             - name: "resolv"
               mountPath: "/etc/resolv.conf"
@@ -164,6 +169,11 @@ spec:
                   key: etcd_keyfile
           securityContext:
             privileged: true
+            capabilities:
+              drop:
+{% for c in apps_drop_cap %}
+                - {{ c.upper() }}
+{% endfor %}
           volumeMounts:
             - mountPath: /lib/modules
               name: lib-modules

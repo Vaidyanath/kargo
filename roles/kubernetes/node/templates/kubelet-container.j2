@@ -9,6 +9,9 @@
 -v {{ docker_daemon_graph }}:/var/lib/docker \
 -v /var/run:/var/run \
 -v /var/lib/kubelet:/var/lib/kubelet \
+{% for c in kubelet_drop_cap %}
+--cap-drop={{ c }} \
+{% endfor %}
 --memory={{ kubelet_memory_limit|regex_replace('Mi', 'M') }} --cpu-shares={{ kubelet_cpu_limit|regex_replace('m', '')  }} \
 {{ hyperkube_image_repo }}:{{ hyperkube_image_tag}} \
 nsenter --target=1 --mount --wd=. -- \

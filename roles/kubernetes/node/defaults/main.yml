@@ -27,3 +27,32 @@ nginx_cpu_requests: 50m
 
 nginx_image_repo: nginx
 nginx_image_tag: 1.11.4-alpine
+
+# Linux capabilities to be dropped for docker container engine
+kubelet_drop_cap:
+  - chown
+  - fowner
+  - fsetid
+  - setgid
+  - setuid
+  - setpcap
+  - net_bind_service
+  - net_raw
+  - sys_chroot
+  - mknod
+  - audit_write
+  - setfcap
+
+apps_drop_cap:
+  - chown
+  - dac_override
+  - fowner
+  - fsetid
+  - kill
+  - setgid
+  - setuid
+  - setpcap
+  - sys_chroot
+  - mknod
+  - audit_write
+  - setfcap

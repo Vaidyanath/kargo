@@ -1,23 +1,35 @@
 ---
 addusers:
   etcd:
-    name: etcd
+    name: "{{ etcd_user }}"
     comment: "Etcd user"
     createhome: yes
     home: "/var/lib/etcd"
     system: yes
-    shell: /bin/nologin
+    shell: /usr/sbin/nologin
+    group: "{{ etcd_group }}"
+    groups: "{{ etcd_cert_group }}"
   kube:
-    name: kube
+    name: "{{ kubelet_user }}"
     comment: "Kubernetes user"
-    shell: /sbin/nologin
+    shell: /usr/sbin/nologin
     system: yes
-    group: "{{ kube_cert_group }}"
+    group: "{{ kubelet_group }}"
+    groups: "{{ etcd_cert_group }},{{ kube_cert_group }}"
     createhome: no
+  netplug:
+    name: "{{ netplug_user }}"
+    comment: "Network plugin user"
+    createhome: no
+    system: yes
+    shell: /usr/sbin/nologin
+    group: "{{ netplug_group }}"
+    groups: "{{ etcd_cert_group }},{{ netplug_cert_group }}"
 
 adduser:
   name: "{{ user.name }}"
   group: "{{ user.name|default(None) }}"
+  groups: "{{ user.groups|default(None) }}"
   comment: "{{ user.comment|default(None) }}"
   shell: "{{ user.shell|default(None) }}"
   system: "{{ user.system|default(None) }}"
