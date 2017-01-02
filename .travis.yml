@@ -1,0 +1,84 @@
+sudo: required
+
+services:
+  - docker
+
+git:
+  depth: 5
+
+env:
+  global:
+    GCE_USER=travis
+    LOG_LEVEL=-v
+    SSH_USER=$GCE_USER
+    TEST_ID=$TRAVIS_JOB_NUMBER
+    CONTAINER_ENGINE=docker
+    PRIVATE_KEY=$GCE_PRIVATE_KEY
+    ANSIBLE_KEEP_REMOTE_FILES=1
+    CLUSTER_MODE=default
+    BOOTSTRAP_OS=none
+  matrix:
+    - >-
+      KUBE_NETWORK_PLUGIN=flannel
+      CLOUD_IMAGE=centos-7
+      CLOUD_REGION=asia-east1-c
+      CLUSTER_MODE=default
+      BOOTSTRAP_OS=none
+
+before_install:
+  # Install Ansible.
+  - pip install --user ansible
+  - pip install --user netaddr
+  # W/A https://github.com/ansible/ansible-modules-core/issues/5196#issuecomment-253766186
+  - pip install --user apache-libcloud==0.20.1
+  - pip install --user boto==2.9.0 -U
+  # Load cached docker images
+  - if [ -d /var/tmp/releases ]; then find /var/tmp/releases -type f -name "*.tar" | xargs -I {} sh -c "zcat {} | docker load"; fi
+
+cache:
+  - directories:
+    - $HOME/.cache/pip
+    - $HOME/.local
+    - /var/tmp/releases
+
+before_script:
+  - echo "RUN $TRAVIS_JOB_NUMBER $KUBE_NETWORK_PLUGIN $CONTAINER_ENGINE "
+  - mkdir -p $HOME/.ssh
+  - echo $PRIVATE_KEY | base64 -d > $HOME/.ssh/id_rsa
+  - echo $GCE_PEM_FILE | base64 -d > $HOME/.ssh/gce
+  - chmod 400 $HOME/.ssh/id_rsa
+  - chmod 755 $HOME/.local/bin/ansible-playbook
+  - $HOME/.local/bin/ansible-playbook --version
+  - cp tests/ansible.cfg .
+  - export PYPATH=$([ $BOOTSTRAP_OS = none ] && echo /usr/bin/python || echo /opt/bin/python)
+
+script:
+  - >
+    $HOME/.local/bin/ansible-playbook tests/cloud_playbooks/create-gce.yml -i tests/local_inventory/hosts.cfg -c local $LOG_LEVEL
+    -e mode=${CLUSTER_MODE}
+    -e test_id=${TEST_ID}
+    -e kube_network_plugin=${KUBE_NETWORK_PLUGIN}
+    -e gce_project_id=${GCE_PROJECT_ID}
+    -e gce_service_account_email=${GCE_ACCOUNT}
+    -e gce_pem_file=${HOME}/.ssh/gce
+    -e cloud_image=${CLOUD_IMAGE}
+    -e inventory_path=${PWD}/inventory/inventory.ini
+    -e cloud_region=${CLOUD_REGION}
+
+    # Create cluster with netchecker app deployed
+  - >
+    $HOME/.local/bin/ansible-playbook -i inventory/inventory.ini -u $SSH_USER -e ansible_ssh_user=$SSH_USER $SSH_ARGS
+    -b --become-user=root -e cloud_provider=gce  $LOG_LEVEL -e kube_network_plugin=${KUBE_NETWORK_PLUGIN}
+    -e bootstrap_os=${BOOTSTRAP_OS}
+    -e ansible_python_interpreter=${PYPATH}
+    -e download_run_once=true
+    -e download_localhost=true
+    -e local_release_dir=/var/tmp/releases
+    -e deploy_netchecker=true
+    cluster.yml --skip-tags=bastion
+
+    # Tests Cases
+    ## Ping the between 2 pod
+  - $HOME/.local/bin/ansible-playbook -i inventory/inventory.ini -e ansible_python_interpreter=${PYPATH} -u $SSH_USER -e ansible_ssh_user=$SSH_USER $SSH_ARGS -b --become-user=root tests/testcases/030_check-network.yml $LOG_LEVEL
+    ## Advanced DNS checks
+  - $HOME/.local/bin/ansible-playbook -i inventory/inventory.ini -e ansible_python_interpreter=${PYPATH} -u $SSH_USER -e ansible_ssh_user=$SSH_USER $SSH_ARGS -b --become-user=root tests/testcases/040_check-network-adv.yml $LOG_LEVEL
