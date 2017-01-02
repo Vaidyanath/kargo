@@ -48,6 +48,7 @@ before_script:
   GS_SECRET_ACCESS_KEY: $GS_SECRET
   ANSIBLE_KEEP_REMOTE_FILES: "1"
   BOOTSTRAP_OS: none
+  RESOLVCONF_MODE: docker_dns
   LOG_LEVEL: "-vv"
 
 .gce: &gce
@@ -101,6 +102,7 @@ before_script:
       -e download_run_once=true
       -e download_localhost=true
       -e deploy_netchecker=true
+      -e resolvconf_mode=${RESOLVCONF_MODE}
       -e local_release_dir=${PWD}/downloads
       cluster.yml
 
@@ -136,6 +138,7 @@ before_script:
   CLOUD_REGION: us-west1-b
   CLUSTER_MODE: separated
   BOOTSTRAP_OS: coreos
+  RESOLVCONF_MODE: host_resolvconf # This is required as long as the CoreOS stable channel uses docker < 1.12
 
 .debian8_canal_ha_variables: &debian8_canal_ha_variables
 # stage: deploy-gce-part1
@@ -172,6 +175,7 @@ before_script:
   CLOUD_REGION: us-east1-b
   CLUSTER_MODE: default
   BOOTSTRAP_OS: coreos
+  RESOLVCONF_MODE: host_resolvconf # This is required as long as the CoreOS stable channel uses docker < 1.12
 
 .rhel7_canal_sep_variables: &rhel7_canal_sep_variables
 # stage: deploy-gce-special
