@@ -20,6 +20,11 @@ spec:
         memory: {{ nginx_memory_requests }}
     securityContext:
       privileged: true
+      capabilities:
+        drop:
+{% for c in apps_drop_cap %}
+          - {{ c.upper() }}
+{% endfor %}
     volumeMounts:
     - mountPath: /etc/nginx
       name: etc-nginx

@@ -77,5 +77,8 @@ for i in node admin; do
     openssl x509 -req -in ${i}.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out ${i}.pem -days 365 > /dev/null 2>&1
 done
 
+# Grant the group read access
+chmod g+r *.pem
+
 # Install certs
 mv *.pem ${SSLDIR}/

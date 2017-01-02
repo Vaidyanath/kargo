@@ -42,7 +42,7 @@
   file:
     path: "{{ kube_config_dir }}"
     state: directory
-    owner: kube
+    owner: "{{ kubelet_user }}"
   when: "{{ inventory_hostname in groups['k8s-cluster'] }}"
   tags: [kubelet, k8s-secrets, kube-controller-manager, kube-apiserver, bootstrap-os, apps, network, master, node]
 
@@ -50,7 +50,7 @@
   file:
     path: "{{ kube_script_dir }}"
     state: directory
-    owner: kube
+    owner: "{{ kubelet_user }}"
   when: "{{ inventory_hostname in groups['k8s-cluster'] }}"
   tags: [k8s-secrets, bootstrap-os]
 
@@ -58,7 +58,7 @@
   file:
     path: "{{ kube_manifest_dir }}"
     state: directory
-    owner: kube
+    owner: "{{ kubelet_user }}"
   when: "{{ inventory_hostname in groups['k8s-cluster'] }}"
   tags: [kubelet, bootstrap-os, master, node]
 
@@ -91,7 +91,7 @@
   file:
     path: "{{ item }}"
     state: directory
-    owner: kube
+    owner: "{{ kubelet_user }}"
   with_items:
     - "/etc/cni/net.d"
     - "/opt/cni/bin"

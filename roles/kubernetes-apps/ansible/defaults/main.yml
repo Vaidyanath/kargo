@@ -51,3 +51,18 @@ netchecker_kubectl_memory_requests: 64M
 
 # SSL
 etcd_cert_dir: "/etc/ssl/etcd/ssl"
+
+# Linux capabilities to be dropped for k8s apps ran by docker container engine
+apps_drop_cap:
+  - chown
+  - dac_override
+  - fowner
+  - fsetid
+  - kill
+  - setgid
+  - setuid
+  - setpcap
+  - sys_chroot
+  - mknod
+  - audit_write
+  - setfcap
