@@ -46,7 +46,7 @@
 - name: add system search domains to docker options
   set_fact:
     docker_dns_search_domains: "{{ docker_dns_search_domains + [item] }}"
-  with_items: "{{ system_search_domains.stdout_lines|default([]) }}"
+  with_items: "{{ system_search_domains.stdout.split(' ') }}"
 
 - name: check number of nameservers
   fail: msg="Too many nameservers"
@@ -55,3 +55,7 @@
 - name: check number of search domains
   fail: msg="Too many search domains"
   when: docker_dns_search_domains|length > 6
+
+- name: check length of search domains
+  fail: msg="Search domains exceeded limit of 256 characters"
+  when: docker_dns_search_domains|join(' ')|length > 256
