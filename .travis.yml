@@ -19,11 +19,11 @@ env:
     BOOTSTRAP_OS=none
   matrix:
     - >-
-      KUBE_NETWORK_PLUGIN=flannel
-      CLOUD_IMAGE=centos-7
+      KUBE_NETWORK_PLUGIN=calico
+      CLOUD_IMAGE=coreos-stable
       CLOUD_REGION=asia-east1-c
       CLUSTER_MODE=default
-      BOOTSTRAP_OS=none
+      BOOTSTRAP_OS=coreos
 
 before_install:
   # Install Ansible.
